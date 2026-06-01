@@ -1,0 +1,168 @@
+## 5. Longest Palindromic Substring
+### Question:
+Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
+
+```
+Example 1:
+
+Input: "babad"
+Output: "bab"
+Note: "aba" is also a valid answer.
+
+Example 2:
+
+Input: "cbbd"
+Output: "bb"
+```
+
+### Thinking:
+* Method1: Iterate center of two points.
+** 1.Center is a character, length of palindromic string is odd.
+** 2.Center is between two characters, length of palindromic is even.
+```Java
+	class Solution {
+	    public String longestPalindrome(String s) {
+	        int start = 0;
+	        int maxLen = 0;
+	        int slen = s.length();
+	        if(slen <= 1) return s;
+	        for(int i = 0; i < slen; i++){
+	            int len = 1;
+	            while(i - len >= 0 && i + len < slen){	//for palindromic centered at one point
+	                if(s.charAt(i - len) == (s.charAt(i + len))){
+	                    if(maxLen < 2 * len + 1){
+	                        maxLen = 2 * len + 1;
+	                        start = i - len;
+	                    }
+	                }else{
+	                    break;
+	                }
+	                len++;
+	            }
+	            //For palindromic centered between characters
+	            len = 1;
+	            while(i - len + 1 >= 0 && i + len < slen){
+	                if(s.charAt(i - len + 1) == s.charAt(i + len)){
+	                    if(maxLen < 2 * len){
+	                        maxLen = 2 * len;
+	                        start = i + 1 - len;
+	                    }
+	                }else{
+	                    break;
+	                }
+	                len++;
+	            }
+	        }
+	        if(maxLen == 0){
+	            return s.substring(0,1);
+	        }
+	        return s.substring(start, start+maxLen);
+	    }
+	}
+```
+Method 2:
+```Java
+class Solution {
+    public String longestPalindrome(String s) {
+        if(s == null || s.length() <= 1) return s;
+        String res = "";
+        for(int i = 0; i <= s.length() - Math.max(1, res.length()); i++){
+            for(int j = i + Math.max(1, res.length()); j <= s.length(); j++){
+                String temp = s.substring(i, j);
+                if(check(temp))
+                    res = temp;
+            }
+        }
+        return res;
+    }
+    private boolean check(String s){
+        int low = 0, high = s.length() - 1;
+        while(low < high){
+            if(s.charAt(low++) != s.charAt(high--))
+                return false;
+        }
+        return true;
+    }
+}
+```
+
+2.
+```Java
+class Solution {
+    public String longestPalindrome(String s) {
+        if(s == null || s.length() <= 1) return s;
+        String result = "";
+        for(int i = 0; i < s.length(); i++){
+            String res1 = expandAroundCenter(s, i, i);
+            String res2 = expandAroundCenter(s, i, i + 1);
+            String res = res1.length() > res2.length() ? res1: res2;
+            result = res.length() > result.length() ? res: result;
+        }
+        return result;
+    }
+    private String expandAroundCenter(String s, int low, int high){
+        if(high >= s.length() || s.charAt(low) != s.charAt(high)) return s.substring(low, high);
+        while(low >=0 && high < s.length() && s.charAt(low) == s.charAt(high)){
+            low--;
+            high++;
+        }
+        return s.substring(++low, high);
+    }
+}
+```
+
+### Third Time
+* Method 1: O(n^3)
+	```Java
+	class Solution {
+	    public String longestPalindrome(String s) {
+	        String res = "";
+	        if(s == null || s.length() == 0) return res;
+	        for(int i = 0; i < s.length(); i++){
+	            for(int j = i + res.length(); j <= s.length(); j++){
+	                String sub = s.substring(i, j);
+	                if(isPalindrome(sub)){
+	                    res = sub;
+	                }
+	            }
+	        }
+	        return res;
+	    }
+	    private boolean isPalindrome(String s){ // O(n)
+	        int low = 0, high = s.length() - 1;
+	        char[] arr = s.toCharArray();
+	        while(low < high){
+	            if(arr[low++] != arr[high--]) return false;
+	        }
+	        return true;
+	    }
+	}
+	```
+
+* Method 2: O(n^2)
+	```Java
+	class Solution {
+	    private int low, max;
+	    private char[] arr;
+	    public String longestPalindrome(String s) {
+	        if(s == null || s.length() == 0) return s;
+	        else if(s.length() == 1) return s;
+	        arr = s.toCharArray();
+	        for(int i = 0; i < arr.length - 1; i++){
+	            expand(i, i);
+	            expand(i, i + 1);
+	        }
+	        return s.substring(low, low + max);
+	    }
+	    private void expand(int low, int high){
+	        while(low >= 0 && high < arr.length && arr[low] == arr[high]){
+	            low--;
+	            high++;
+	        }
+	        if(this.max < high - low - 1){
+	            this.low = low + 1;
+	            this.max = high - 1 - low;
+	        }
+	    }
+	}
+	```
