@@ -1,0 +1,97 @@
+##3. Longest Substring Without Repeating Characters
+Given a string, find the length of the longest substring without repeating characters.
+
+```
+Example 1:
+
+Input: "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3.
+
+Example 2:
+
+Input: "bbbbb"
+Output: 1
+Explanation: The answer is "b", with the length of 1.
+
+Example 3:
+
+Input: "pwwkew"
+Output: 3
+Explanation: The answer is "wke", with the length of 3.
+             Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+```
+### Solution
+
+```Java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s == null || s.length() == 0) return 0;
+        char[] arr = s.toCharArray();
+        int max = Integer.MIN_VALUE;
+        for(int i = 0; i < arr.length; i++){
+            Set<Character> set = new HashSet<>();
+            for(int j = i; j < arr.length; j++){
+                if(!set.contains(arr[j]))
+                    set.add(arr[j]);
+                else{
+                    max = Math.max(max, set.size());
+                    break;
+                }
+            }
+            max = Math.max(set.size(), max);
+        }
+        return max;
+    }
+}
+```
+##second time
+
+```Java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s == null || s.length() == 0) return 0;
+        int slow = 0, fast = 0;
+        char[] arr = s.toCharArray();
+        Set<Character> set = new HashSet<>();
+        int max = 0;
+        while(fast < arr.length && slow < arr.length){
+            if(!set.contains(arr[fast]))
+                set.add(arr[fast++]);
+            else
+                set.remove(arr[slow++]);
+            max = Math.max(max, set.size());
+        }
+        return max;
+    }
+}
+```
+
+### Third Time
+* Method 1: Two pointers + Set
+	```Java
+	class Solution {
+		public int lengthOfLongestSubstring(String s) {
+			if(s == null || s.length() == 0) return 0;
+			int slow = 0, fast = 0;
+			Set<Character> set = new HashSet<>();
+			char[] arr = s.toCharArray();
+			int res = 0;
+			while(fast < arr.length){
+				if(!set.contains(arr[fast])){
+					set.add(arr[fast]);
+					res = Math.max(res, fast - slow + 1);
+				}else{  // set already contains key of arr[fast]
+					while(arr[slow] != arr[fast] && slow < fast){
+						set.remove(arr[slow++]);
+					}
+					slow++;
+				}
+				fast++;
+			}
+			return res;
+		}
+	}
+	```
+
+
